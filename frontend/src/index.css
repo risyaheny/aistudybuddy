@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-[#0f0a0f] text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-pink-500 to-rose-500
+    hover:from-pink-400 hover:to-rose-400
+    text-white font-semibold py-2.5 px-5 rounded-xl
+    transition-all duration-200 shadow-lg shadow-pink-900/30
+    disabled:opacity-40 disabled:cursor-not-allowed active:scale-95;
+  }
+  .btn-secondary {
+    @apply bg-white/5 hover:bg-white/10 text-pink-200/70 hover:text-white
+    font-semibold py-2.5 px-5 rounded-xl
+    border border-pink-500/15 hover:border-pink-500/30
+    transition-all duration-200 active:scale-95;
+  }
+  .card {
+    @apply bg-white/[0.04] backdrop-blur-sm rounded-2xl
+    border border-pink-500/10 p-6;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl
+    border border-pink-500/15 bg-white/[0.04]
+    text-white placeholder-pink-300/20
+    focus:outline-none focus:ring-2 focus:ring-pink-500/40 focus:border-pink-500/40
+    transition-all duration-200;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .label {
+    @apply block text-sm font-medium text-pink-200/50 mb-1.5;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #831843; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9d174d; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeUp 0.3s ease-out; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+.float { animation: float 4s ease-in-out infinite; }
+
+/* Flashcard 3D flip */
+.flashcard-scene {
+  perspective: 1000px;
+  width: 100%;
+  min-height: 280px;
+}
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+/* Select dark */
+select option { background: #1a0a14; color: white; }

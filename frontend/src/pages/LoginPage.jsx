@@ -47,17 +47,17 @@ export default function LoginPage() {
               <Sparkles size={12} className="text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white">Study Buddy</h1>
-          <p className="text-pink-300/50 mt-1 text-sm">AI Learning Assistant untuk Mahasiswa</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Study Buddy</h1>
+          <p className="mt-1 text-sm flex items-center justify-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+            <Sparkles size={13} className="text-pink-400" /> AI Learning Assistant untuk Mahasiswa
+          </p>
         </div>
 
         {/* Card */}
-        <div className="relative">
-          {/* Card glow border */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/10 blur-sm" />
-          <div className="relative bg-[#150d15] rounded-2xl border border-pink-500/20 p-8 shadow-2xl shadow-pink-900/20">
-            <h2 className="text-xl font-bold text-white mb-1">Masuk ke Akun</h2>
-            <p className="text-sm text-pink-300/40 mb-6">Selamat datang kembali 💕</p>
+        <div className="relative rounded-2xl border p-8 shadow-2xl"
+          style={{ background: 'var(--bg-modal)', borderColor: 'var(--border)' }}>
+          <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Masuk ke Akun</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Selamat datang kembali 💕</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -89,8 +89,8 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-6 pt-5 border-t border-pink-500/10 text-center">
-              <p className="text-sm text-pink-300/40">
+            <div className="mt-6 pt-5 border-t text-center" style={{ borderColor: 'var(--border)' }}>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                 Belum punya akun?{' '}
                 <Link to="/register" className="text-pink-400 font-semibold hover:text-pink-300 transition-colors">
                   Daftar sekarang
@@ -98,7 +98,6 @@ export default function LoginPage() {
               </p>
             </div>
           </div>
-        </div>
 
         <p className="text-center text-xs text-pink-300/20 mt-6 flex items-center justify-center gap-1">
           Made with <Heart size={10} className="text-pink-400" fill="currentColor" /> for students

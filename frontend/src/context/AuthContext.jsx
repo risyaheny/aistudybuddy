@@ -4,7 +4,7 @@ import api from '../utils/api';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser]     = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,8 +38,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // Update user data di context setelah edit profil
+  const updateUser = (data) => setUser(prev => ({ ...prev, ...data }));
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

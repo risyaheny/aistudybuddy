@@ -46,13 +46,68 @@ export default function QuizPage() {
 
   const submitQuiz = () => {
     let correct = 0;
+
+    // Normalisasi untuk perbandingan robust
+    const norm = (str) => {
+      if (!str) return '';
+      return str.toLowerCase().trim()
+        .replace(/^[a-d]\.\s*/i, '')
+        .replace(/\s+/g, ' ').trim();
+    };
+
+    const checkAnswer = (ua, ca, options = [], type = '') => {
+      if (!ua) return false;
+      const uaN = norm(ua);
+      const caN = norm(ca);
+
+      // 1. Exact match
+      if (uaN === caN) return true;
+
+      // 2. correct_answer adalah huruf (A/B/C/D), user pilih teks opsi
+      if (/^[a-d]$/i.test(ca.trim()) && options.length) {
+        const idx = ca.trim().toUpperCase().charCodeAt(0) - 65;
+        if (options[idx] && norm(options[idx]) === uaN) return true;
+      }
+
+      // 3. user jawab huruf, correct_answer adalah teks
+      if (/^[a-d]$/i.test(ua.trim()) && options.length) {
+        const idx = ua.trim().toUpperCase().charCodeAt(0) - 65;
+        if (options[idx] && norm(options[idx]) === caN) return true;
+      }
+
+      // 4. Benar/Salah
+      if (type === 'true_false') {
+        const trueV  = ['benar', 'true', 'ya', 'betul'];
+        const falseV = ['salah', 'false', 'tidak', 'bukan'];
+        const uaT = trueV.some(v => uaN.includes(v));
+        const uaF = falseV.some(v => uaN.includes(v));
+        const caT = trueV.some(v => caN.includes(v));
+        const caF = falseV.some(v => caN.includes(v));
+        if (uaT && caT) return true;
+        if (uaF && caF) return true;
+      }
+
+      // 5. Partial match (jawaban panjang)
+      if (uaN.length > 3 && caN.length > 3) {
+        if (caN.includes(uaN) || uaN.includes(caN)) return true;
+      }
+
+      return false;
+    };
+
     const results = quiz.questions.map(q => {
       const ua = answers[q.id] || '';
-      const ok = ua.toLowerCase().trim() === (q.correct_answer || '').toLowerCase().trim();
+      const ok = checkAnswer(ua, q.correct_answer || '', q.options || [], q.type);
       if (ok) correct++;
       return { ...q, user_answer: ua, is_correct: ok };
     });
-    setResult({ score: Math.round((correct / quiz.questions.length) * 100), correct, total: quiz.questions.length, results });
+
+    setResult({
+      score: Math.round((correct / quiz.questions.length) * 100),
+      correct,
+      total: quiz.questions.length,
+      results
+    });
     setStep('result');
     if (quiz?.id) api.post(`/quiz/${quiz.id}/submit`, { answers }).catch(() => {});
   };
@@ -214,10 +269,9 @@ export default function QuizPage() {
           ) : (
             <div className="space-y-2">
               {q.options?.map((opt, i) => {
-                const val = opt.replace(/^[A-D]\.\s*/, '').trim() || opt;
-                const selected = answers[q.id] === val;
+                const selected = answers[q.id] === opt;
                 return (
-                  <button key={i} onClick={() => setAnswers({ ...answers, [q.id]: val })}
+                  <button key={i} onClick={() => setAnswers({ ...answers, [q.id]: opt })}
                     className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-all ${
                       selected
                         ? 'border-pink-500/50 bg-pink-500/15 text-white font-medium'

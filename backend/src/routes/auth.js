@@ -90,14 +90,15 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    // Find user by username
+    // Find user by username — coba juga case-insensitive
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('id, username, email, full_name, password_hash')
-      .eq('username', username)
+      .ilike('username', username)
       .single();
 
     if (error || !user) {
+      console.error('Login - user not found:', error?.message);
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 

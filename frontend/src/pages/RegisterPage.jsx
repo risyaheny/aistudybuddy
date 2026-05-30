@@ -42,15 +42,16 @@ export default function RegisterPage() {
               <Sparkles size={12} className="text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white">Study Buddy</h1>
-          <p className="text-pink-300/50 mt-1 text-sm">Buat akun dan mulai belajar lebih cerdas</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Study Buddy</h1>
+          <p className="mt-1 text-sm flex items-center justify-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+            <Sparkles size={13} className="text-pink-400" /> Buat akun dan mulai belajar lebih cerdas
+          </p>
         </div>
 
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/10 blur-sm" />
-          <div className="relative bg-[#150d15] rounded-2xl border border-pink-500/20 p-8 shadow-2xl shadow-pink-900/20">
-            <h2 className="text-xl font-bold text-white mb-1">Buat Akun Baru</h2>
-            <p className="text-sm text-pink-300/40 mb-6">Bergabung dan mulai perjalanan belajarmu ✨</p>
+        <div className="relative rounded-2xl border p-8 shadow-2xl"
+          style={{ background: 'var(--bg-modal)', borderColor: 'var(--border)' }}>
+          <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Buat Akun Baru</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Bergabung dan mulai perjalanan belajarmu ✨</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -90,8 +91,8 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            <div className="mt-6 pt-5 border-t border-pink-500/10 text-center">
-              <p className="text-sm text-pink-300/40">
+            <div className="mt-6 pt-5 border-t text-center" style={{ borderColor: 'var(--border)' }}>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                 Sudah punya akun?{' '}
                 <Link to="/login" className="text-pink-400 font-semibold hover:text-pink-300 transition-colors">
                   Masuk di sini
@@ -99,7 +100,6 @@ export default function RegisterPage() {
               </p>
             </div>
           </div>
-        </div>
 
         <p className="text-center text-xs text-pink-300/20 mt-6 flex items-center justify-center gap-1">
           Made with <Heart size={10} className="text-pink-400" fill="currentColor" /> for students

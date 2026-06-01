@@ -12,17 +12,26 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.username || !form.password) { toast.error('Isi semua field'); return; }
-    setLoading(true);
-    try {
-      await login(form.username, form.password);
+  e.preventDefault();
+  if (!form.username || !form.password) { toast.error('Isi semua field'); return; }
+  setLoading(true);
+  try {
+    const data = await login(form.username, form.password);
+    
+    // Pengecekan ekstra: Pastikan token benar-benar masuk ke localStorage sebelum pindah halaman
+    if (localStorage.getItem('token')) {
       toast.success('Selamat datang kembali! 💕');
-      navigate('/dashboard');
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Login gagal');
-    } finally { setLoading(false); }
-  };
+      
+      // Menggunakan window.location.href jauh lebih aman untuk memaksa browser 
+      // memuat ulang halaman dashboard dan membaca token baru secara bersih di Vercel
+      window.location.href = '/dashboard';
+    } else {
+      toast.error('Token gagal disimpan, silakan coba lagi');
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.error || 'Login gagal');
+  } finally { setLoading(false); }
+};
 
   return (
     <div className="min-h-screen bg-[#0f0a0f] flex items-center justify-center p-4 relative overflow-hidden">

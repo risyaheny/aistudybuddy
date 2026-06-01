@@ -150,4 +150,53 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
+// Update profile user (Penyembuh Poin 1)
+router.put('/update-profile', authenticateToken, async (req, res) => {
+  try {
+    const { full_name, email } = req.body;
+    const userId = req.user.id; // Diambil dari token JWT hasil enkripsi login
+
+    if (!full_name && !email) {
+      return res.status(400).json({ error: 'Data yang ingin diubah tidak boleh kosong' });
+    }
+
+    // Siapkan objek data yang dinamis untuk diupdate
+    const updateData = {};
+    if (full_name) updateData.full_name = full_name;
+    if (email) updateData.email = email;
+
+    // Jika user berniat mengganti email, cek dulu apakah email baru sudah dipakai orang lain
+    if (email) {
+      const { data: existingEmail } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .neq('id', userId) // Cari di luar ID user saat ini
+        .single();
+
+      if (existingEmail) {
+        return res.status(409).json({ error: 'Email sudah terdaftar oleh pengguna lain' });
+      }
+    }
+
+    // Eksekusi update ke tabel users Supabase
+    const { data: updatedUser, error } = await supabaseAdmin
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+      .select('id, username, email, full_name, created_at')
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      message: 'Profil berhasil diperbarui ✨',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('Update profile error:', err);
+    res.status(500).json({ error: 'Gagal memperbarui profil', message: err.message });
+  }
+});
+
 export default router;

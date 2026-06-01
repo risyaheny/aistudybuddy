@@ -74,20 +74,36 @@ export default function PlannerPage() {
                 <Plus size={12} /> Tambah
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3 md:space-y-2">
               {form.subjects.map((s, i) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <input type="text" className="input-field flex-1 text-sm" placeholder={`Mata kuliah ${i + 1}`}
-                    value={s.name} onChange={e => updateSubject(i, 'name', e.target.value)} />
-                  <select className="input-field w-28 text-sm" value={s.difficulty} onChange={e => updateSubject(i, 'difficulty', e.target.value)}>
-                    {DIFFICULTY.map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                  <input type="number" className="input-field w-20 text-sm" placeholder="Jam"
-                    value={s.hours} onChange={e => updateSubject(i, 'hours', e.target.value)} />
+                <div key={i} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center p-3 md:p-0 bg-pink-500/5 md:bg-transparent rounded-xl border border-pink-500/10 md:border-none relative">
+                  
+                  {/* Input Nama Mata Kuliah */}
+                  <div className="md:col-span-6">
+                    <input type="text" className="input-field w-full text-sm" placeholder={`Mata kuliah ${i + 1}`}
+                      value={s.name} onChange={e => updateSubject(i, 'name', e.target.value)} />
+                  </div>
+
+                  {/* Dropdown Tingkat Kesulitan */}
+                  <div className="md:col-span-3">
+                    <select className="input-field w-full text-sm" value={s.difficulty} onChange={e => updateSubject(i, 'difficulty', e.target.value)}>
+                      {DIFFICULTY.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                  </div>
+
+                  {/* Input Estimasi Jam */}
+                  <div className="md:col-span-2">
+                    <input type="number" className="input-field w-full text-sm" placeholder="Jam"
+                      value={s.hours} onChange={e => updateSubject(i, 'hours', e.target.value)} />
+                  </div>
+
+                  {/* Tombol Hapus */}
                   {form.subjects.length > 1 && (
-                    <button onClick={() => removeSubject(i)} className="text-pink-300/20 hover:text-rose-400 p-1 transition-colors">
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="md:col-span-1 flex justify-end absolute top-2 right-2 md:relative md:top-0 md:right-0">
+                      <button onClick={() => removeSubject(i)} className="text-pink-300/40 hover:text-rose-400 p-1.5 md:p-1 transition-colors bg-rose-500/10 md:bg-transparent rounded-lg">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}

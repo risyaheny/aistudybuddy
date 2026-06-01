@@ -14,11 +14,13 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Handle 401 globally
+// Handle 401 globally (VERSI AMAN & ANTI NOT-FOUND)
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    // Hanya lempar ke /login jika user sedang di DALAM aplikasi (dashboard) tapi tokennya expired.
+    // Jika error terjadi SAAT user berada di halaman /login (salah password), JANGAN di-redirect!
+    if (error.response?.status === 401 && window.location.pathname !== '/login') {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }

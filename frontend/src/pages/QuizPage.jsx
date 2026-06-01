@@ -46,6 +46,7 @@ export default function QuizPage() {
 
   const submitQuiz = () => {
     let correct = 0;
+    let scorableTotal = 0;
 
     // Normalisasi untuk perbandingan robust
     const norm = (str) => {
@@ -97,15 +98,20 @@ export default function QuizPage() {
 
     const results = quiz.questions.map(q => {
       const ua = answers[q.id] || '';
+      // Essay tidak dihitung benar/salah
+      if (q.type === 'essay') {
+        return { ...q, user_answer: ua, is_correct: null, is_essay: true };
+      }
+      scorableTotal++;
       const ok = checkAnswer(ua, q.correct_answer || '', q.options || [], q.type);
       if (ok) correct++;
-      return { ...q, user_answer: ua, is_correct: ok };
+      return { ...q, user_answer: ua, is_correct: ok, is_essay: false };
     });
 
     setResult({
-      score: Math.round((correct / quiz.questions.length) * 100),
+      score: scorableTotal > 0 ? Math.round((correct / scorableTotal) * 100) : null,
       correct,
-      total: quiz.questions.length,
+      total: scorableTotal,
       results
     });
     setStep('result');
@@ -303,39 +309,99 @@ export default function QuizPage() {
 
   // ---- RESULT ----
   if (step === 'result') {
-    const isGood = result.score >= 70;
-    const isMid  = result.score >= 50;
+    const hasScore = result.score !== null;
+    const isGood   = result.score >= 70;
+    const isMid    = result.score >= 50;
     const scoreStyle = isGood ? 'text-pink-300' : isMid ? 'text-amber-300' : 'text-rose-400';
     const scoreBg    = isGood ? 'bg-pink-500/10 border-pink-500/20' : isMid ? 'bg-amber-500/10 border-amber-500/20' : 'bg-rose-500/10 border-rose-500/20';
-    const msg        = isGood ? 'Luar biasa! 🎉' : isMid ? 'Lumayan bagus! 💪' : 'Ayo belajar lagi! 📚';
+    const msg        = !hasScore ? 'Jawaban kamu sudah dicatat 📝' : isGood ? 'Luar biasa! 🎉' : isMid ? 'Lumayan bagus! 💪' : 'Ayo belajar lagi! 📚';
+
+    // Label feedback untuk soal non-essay
+    const feedbackLabel = (r) => {
+      if (r.is_correct === true)  return { text: 'Bagus',       cls: 'text-pink-400'  };
+      if (r.user_answer === '' || r.user_answer == null) return { text: 'Tidak dijawab', cls: 'text-pink-300/30' };
+      return { text: 'Kurang tepat', cls: 'text-rose-400' };
+    };
 
     return (
       <div className="space-y-4 fade-in">
-        <div className={`card border text-center ${scoreBg}`}>
+        <div className={`card border text-center ${hasScore ? scoreBg : 'bg-white/[0.03] border-pink-500/15'}`}>
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500/20 to-rose-500/20 border border-pink-500/20 flex items-center justify-center mx-auto mb-3">
-            <Trophy size={28} className={scoreStyle} />
+            <Trophy size={28} className={hasScore ? scoreStyle : 'text-pink-300/60'} />
           </div>
-          <p className={`text-5xl font-bold ${scoreStyle} mb-1`}>{result.score}%</p>
-          <p className="font-semibold text-white text-lg">{msg}</p>
-          <p className="text-pink-300/40 text-sm mt-1">{result.correct} dari {result.total} soal benar</p>
+          {hasScore ? (
+            <>
+              <p className={`text-5xl font-bold ${scoreStyle} mb-1`}>{result.score}%</p>
+              <p className="font-semibold text-white text-lg">{msg}</p>
+              <p className="text-pink-300/40 text-sm mt-1">{result.correct} dari {result.total} soal benar</p>
+            </>
+          ) : (
+            <>
+              <p className="font-semibold text-white text-lg">{msg}</p>
+              <p className="text-pink-300/40 text-sm mt-1">Bandingkan jawabanmu dengan kunci di bawah</p>
+            </>
+          )}
         </div>
 
         <div className="space-y-2">
-          {result.results?.map((r, i) => (
-            <div key={i} className={`card border ${r.is_correct ? 'border-pink-500/20 bg-pink-500/5' : 'border-rose-500/20 bg-rose-500/5'}`}>
-              <div className="flex items-start gap-3">
-                {r.is_correct
-                  ? <CheckCircle size={15} className="text-pink-400 flex-shrink-0 mt-0.5" />
-                  : <XCircle    size={15} className="text-rose-400 flex-shrink-0 mt-0.5" />}
-                <div className="flex-1">
-                  <p className="font-medium text-white text-sm">{r.question}</p>
-                  <p className="text-xs text-pink-300/40 mt-1">Jawabanmu: <span className="text-pink-200/60">{r.user_answer || '(tidak dijawab)'}</span></p>
-                  {!r.is_correct && <p className="text-xs text-pink-400 mt-0.5">Jawaban benar: <span className="font-medium">{r.correct_answer}</span></p>}
-                  {r.explanation && <p className="text-xs text-pink-300/30 mt-1 italic">{r.explanation}</p>}
+          {result.results?.map((r, i) => {
+            if (r.is_essay) {
+              // Tampilan khusus essay — tidak ada benar/salah
+              return (
+                <div key={i} className="card border border-fuchsia-500/20 bg-fuchsia-500/5">
+                  <div className="flex items-start gap-3">
+                    <Sparkles size={15} className="text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium text-fuchsia-400/70 uppercase tracking-wide">Essay</span>
+                      </div>
+                      <p className="font-medium text-white text-sm">{r.question}</p>
+                      <div className="mt-2 p-2.5 rounded-lg bg-white/[0.03] border border-pink-500/10">
+                        <p className="text-xs text-pink-300/40 mb-1">Jawabanmu:</p>
+                        <p className="text-sm text-pink-100/70">{r.user_answer || <span className="italic text-pink-300/30">Tidak dijawab</span>}</p>
+                      </div>
+                      <div className="mt-2 p-2.5 rounded-lg bg-fuchsia-500/8 border border-fuchsia-500/20">
+                        <p className="text-xs text-fuchsia-400/70 mb-1">Jawaban yang benar:</p>
+                        <p className="text-sm text-white/80 leading-relaxed">{r.correct_answer}</p>
+                      </div>
+                      {r.explanation && (
+                        <p className="text-xs text-pink-300/30 mt-2 italic">{r.explanation}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // Soal non-essay (pilihan ganda, benar/salah)
+            const fb = feedbackLabel(r);
+            return (
+              <div key={i} className={`card border ${r.is_correct ? 'border-pink-500/20 bg-pink-500/5' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                <div className="flex items-start gap-3">
+                  {r.is_correct
+                    ? <CheckCircle size={15} className="text-pink-400 flex-shrink-0 mt-0.5" />
+                    : <XCircle    size={15} className="text-rose-400 flex-shrink-0 mt-0.5" />}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-xs font-semibold ${fb.cls}`}>{fb.text}</span>
+                    </div>
+                    <p className="font-medium text-white text-sm">{r.question}</p>
+                    <p className="text-xs text-pink-300/40 mt-1">
+                      Jawabanmu: <span className="text-pink-200/60">{r.user_answer || '(tidak dijawab)'}</span>
+                    </p>
+                    {!r.is_correct && (
+                      <p className="text-xs text-pink-400 mt-0.5">
+                        Jawaban benar: <span className="font-medium">{r.correct_answer}</span>
+                      </p>
+                    )}
+                    {r.explanation && (
+                      <p className="text-xs text-pink-300/30 mt-1 italic">{r.explanation}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <button onClick={reset} className="btn-primary w-full flex items-center justify-center gap-2">

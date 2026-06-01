@@ -1,7 +1,19 @@
 import axios from 'axios';
 
+// Membuat baseURL pintar mendeteksi lingkungan produksi vs lokal
+const getBaseURL = () => {
+  if (typeof window !== 'undefined') {
+    // Jika berjalan di Vercel (Production), tembak domain utama Vercel + /api
+    if (window.location.hostname !== 'localhost') {
+      return `${window.location.origin}/api`;
+    }
+  }
+  // Jika di laptop sendiri (Development), tetap tembak port Express lokal
+  return 'http://localhost:5000/api';
+};
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: getBaseURL(),
   timeout: 60000,
 });
 
@@ -14,12 +26,10 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Handle 401 globally (VERSI AMAN & ANTI NOT-FOUND)
+// Handle 401 globally
 api.interceptors.response.use(
   response => response,
   error => {
-    // Hanya lempar ke /login jika user sedang di DALAM aplikasi (dashboard) tapi tokennya expired.
-    // Jika error terjadi SAAT user berada di halaman /login (salah password), JANGAN di-redirect!
     if (error.response?.status === 401 && window.location.pathname !== '/login') {
       localStorage.removeItem('token');
       window.location.href = '/login';

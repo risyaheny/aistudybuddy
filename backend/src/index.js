@@ -12,9 +12,15 @@ dotenv.config();
 const app = express();
 
 // 1. Middleware CORS Adaptif (Bisa lokal, bisa Vercel)
+// Gantilah konfigurasi CORS lama dengan kode di bawah ini
 app.use(cors({
-  origin: true, // Mengizinkan domain frontend lokal maupun vercel.app mengakses API
-  credentials: true
+  origin: [
+    'http://localhost:5173',
+    /vercel\.app$/ // Kode ini otomatis mengizinkan domain utama maupun domain preview dari Vercel
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));

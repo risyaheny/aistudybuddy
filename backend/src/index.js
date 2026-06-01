@@ -10,13 +10,13 @@ import profileRoutes from './routes/profile.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
+// 1. Middleware CORS Adaptif (Bisa lokal, bisa Vercel)
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: true, // Mengizinkan domain frontend lokal maupun vercel.app mengakses API
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -38,6 +38,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(`Study Buddy Backend running on http://localhost:${PORT}`);
-});
+// 2. Kondisional app.listen (Hanya berjalan jika di komputer lokal)
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Study Buddy Backend running on http://localhost:${PORT}`);
+  });
+}
+
+// 3. Ekspor aplikasi utama agar bisa dibaca utuh oleh vercel.json
+export default app;

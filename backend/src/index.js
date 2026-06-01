@@ -48,7 +48,7 @@ app.use((err, req, res, next) => {
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
-    console.log(`Study Buddy Backend running on http://localhost:${PORT}`);
+    console.log(`Server lokal berjalan aman di port ${PORT}`);
   });
 }
 

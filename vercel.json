@@ -1,14 +1,19 @@
 {
   "version": 2,
-  "outputDirectory": "frontend/dist",
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "backend/src/index.js"
-    },
-    {
-      "source": "/assets/(.*)",
-      "destination": "frontend/dist/assets/$1"
+      "destination": "api/index.js"
     },
     {
       "source": "/(.*)",

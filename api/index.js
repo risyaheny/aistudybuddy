@@ -1,3 +1,4 @@
-// Mengarahkan Vercel untuk membaca Express dari folder backend asli kamu
-const app = require('../backend/src/index.js');
+const path = require('path');
+const app = require(path.join(__dirname, '../backend/src/index.js'));
+
 module.exports = app;
